@@ -46,38 +46,55 @@ pred (S n) = n
 even :: Nat -> Nat
 even O = S O
 even (S O) = O
-even (S (S n)) = odd n
+even (S (S n)) = even n
 
 odd :: Nat -> Nat
 odd O = O
 odd (S O) = S O
-odd (S (S n)) = even n
+odd (S (S n)) = odd n
 
 -- This is called the dotminus or monus operator
 -- (also: proper subtraction, arithmetic subtraction, ...).
 -- It behaves like subtraction, except that it returns 0
 -- when "normal" subtraction would return a negative number.
 monus :: Nat -> Nat -> Nat
-monus = undefined
+monus n O = n
+monus O (S n) = O
+monus (S n) (S m) = monus n m
 
 (-*) :: Nat -> Nat -> Nat
 (-*) = monus
 
 -- multiplication
 (*) :: Nat -> Nat -> Nat
-(*) = undefined
+multiplication n O = O
+multiplication (S O) (S n) = S n
+multiplication n (S m) = (multiplication n m) + n
+(*) = multiplication
 
 infixl 7 *
 
 -- exponentiation
 (^) :: Nat -> Nat -> Nat
-(^) = undefined
+exponentiation _ O = S O
+exponentiation O (S n) = O
+exponentiation n (S m) = (exponentiation n m) * n
+(^) = exponentiation
 
--- decide: infix? ? ^
+infixr 9 ^
 
--- quotient
+-- quotient 
 (/) :: Nat -> Nat -> Nat
-(/) = undefined
+
+O / _ = O
+_ / O = O
+n / (S m) =
+  let novoDividendo = n `monus` (S m)
+  in case novoDividendo of
+    O -> O
+    (S _) -> S (novoDividendo / (S m))
+
+
 
 -- remainder
 (%) :: Nat -> Nat -> Nat
