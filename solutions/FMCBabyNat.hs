@@ -48,6 +48,7 @@ even O = S O
 even (S O) = O
 even (S (S n)) = even n
 
+
 odd :: Nat -> Nat
 odd O = O
 odd (S O) = S O
@@ -57,12 +58,11 @@ odd (S (S n)) = odd n
 -- (also: proper subtraction, arithmetic subtraction, ...).
 -- It behaves like subtraction, except that it returns 0
 -- when "normal" subtraction would return a negative number.
+
 monus :: Nat -> Nat -> Nat
 monus n O = n
 monus O (S n) = O
 monus (S n) (S m) = monus n m
-
-(-*) :: Nat -> Nat -> Nat
 (-*) = monus
 
 -- multiplication
@@ -83,46 +83,72 @@ exponentiation n (S m) = (exponentiation n m) * n
 
 infixr 9 ^
 
--- quotient 
-(/) :: Nat -> Nat -> Nat
 
+-- quotient
+(/) :: Nat -> Nat -> Nat
 O / _ = O
 _ / O = O
 n / (S m) =
-  let novoDividendo = n `monus` (S m)
+  let novoDividendo = n -* (S m)
   in case novoDividendo of
     O -> O
     (S _) -> S (novoDividendo / (S m))
 
-
-
 -- remainder
 (%) :: Nat -> Nat -> Nat
-(%) = undefined
+O % _ = O
+n % O = O
+
+n % (S m) =
+  let subtraido = n `monus` (S m)
+  in case subtraido of
+    O -> n
+    (S _) -> subtraido % (S m)
 
 -- divides
 -- just for a change, we start by defining the "symbolic" operator
 -- and then define `devides` as a synonym to it
 -- again, outputs: O means False, S O means True
 (|||) :: Nat -> Nat -> Nat
-(|||) = undefined
+_ ||| O = O
+
+O ||| _ = S O
+
+n ||| m =
+  case (n % m) of
+    O -> S O
+    _ -> O
+
+divides :: Nat -> Nat -> Nat
+divides n m = n ||| m
 
 -- x `absDiff` y = |x - y|
 -- (Careful here: this - is the actual minus operator we know from the integers!)
 absDiff :: Nat -> Nat -> Nat
-absDiff = undefined
+x |-| y = (x -* y) + (y -* x)
+absDiff = (|-|)
 
 (|-|) :: Nat -> Nat -> Nat
-(|-|) = absDiff
+
 
 factorial :: Nat -> Nat
-factorial = undefined
+factorial O = S O
+factorial (S n) = (S n) * (factorial n)
 
 -- signum of a number (-1, 0, or 1)
 sg :: Nat -> Nat
-sg = undefined
+sg O = O
+sg _ = S O
 
 -- lo b a is the floor of the logarithm base b of a
 lo :: Nat -> Nat -> Nat
-lo = undefined
+lo O _ = O
+lo _ O = O
+lo (S O) _ = O
+lo n m = lof n m O (S O)
 
+lof :: Nat -> Nat -> Nat -> Nat -> Nat
+lof n m k nk =
+  case (nk * n) -* m of
+    O -> lof n m (S k) (nk * n)
+    (S _) -> k
