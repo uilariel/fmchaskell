@@ -35,12 +35,15 @@ f . g = \x -> f (g x)
 (.>) :: (a -> b) -> (b -> c) -> a -> c
 (.>) = flip (.)
 
+($) :: (a -> b) -> a -> b
+f $ x = f x
+
 -- ($) takes a function and a suitable argument and applies the function to the argument
 -- think: why would we ever want that?
 
 -- iterate: figure it out by its type
 iterate :: (a -> a) -> a -> [a]
-iterate = undefined
+iterate f x = x : iterate f (f x)
 
 -- orbit
 orbit = flip iterate
